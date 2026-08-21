@@ -65,7 +65,7 @@ function Dashboard(props) {
     return (
         <div className="container dash-container">
             <div className="dash-header">
-                <h2>👋 Welcome back{props.user.name ? ', ' + props.user.name : ''}</h2>
+                <h2> Welcome back{props.user.name ? ', ' + props.user.name : ''}</h2>
                 <p className="dash-subtitle">
                     {props.user.role === 'teacher'
                         ? 'Manage your classrooms and stay connected with your students.'

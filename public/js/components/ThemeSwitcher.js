@@ -11,9 +11,9 @@ function ThemeSwitcher() {
 
     return (
         <select className="theme-switcher" value={theme} onChange={function (e) { setTheme(e.target.value); }}>
-            <option value="light">☀️ Light</option>
-            <option value="dark">🌙 Dark</option>
-            <option value="ocean">🌊 Ocean</option>
+            <option value="light"> Light</option>
+            <option value="dark"> Dark</option>
+            <option value="ocean"> Ocean</option>
         </select>
     );
 }
