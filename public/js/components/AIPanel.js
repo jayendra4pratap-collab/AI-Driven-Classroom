@@ -7,13 +7,30 @@ function AIPanel(props) {
     var s3 = React.useState(0); var selectedLiveIndex = s3[0], setSelectedLiveIndex = s3[1];
     var s4 = React.useState(0); var selectedPdfIndex = s4[0], setSelectedPdfIndex = s4[1];
     var s5 = React.useState('3d'); var activeSubTab = s5[0], setActiveSubTab = s5[1];
+    // New: which flashcard is currently enlarged in the fullscreen modal.
+    var s6 = React.useState(null); var enlargedCard = s6[0], setEnlargedCard = s6[1];
 
     React.useEffect(function () { setSelectedLiveIndex(0); }, [matchHistory.length]);
+
+    // Close enlarged modal on Escape key for convenience.
+    React.useEffect(function () {
+        if (!enlargedCard) return;
+        function onKey(e) { if (e.key === 'Escape') setEnlargedCard(null); }
+        window.addEventListener('keydown', onKey);
+        return function () { window.removeEventListener('keydown', onKey); };
+    }, [enlargedCard]);
 
     function toggleOpen() {
         var next = !open;
         setOpen(next);
         if (next && props.onOpened) props.onOpened();
+    }
+
+    function handleEnlarge(card) { setEnlargedCard(card); }
+    function handleCloseEnlarge() { setEnlargedCard(null); }
+    function handlePresentFromModal(card) {
+        if (props.onPresentCard) props.onPresentCard(card);
+        setEnlargedCard(null);
     }
 
     var current = mainTab === 'live' ? matchHistory[selectedLiveIndex] : pdfTopics[selectedPdfIndex];
@@ -39,7 +56,7 @@ function AIPanel(props) {
 
                     <div className="ai-panel-body">
                         <div className="ai-topics-col">
-                            <p className="ai-topics-label">{mainTab === 'live' ? 'Detected while teaching' : 'All topics in this PDF'}</p>
+                            <p className="ai-topics-label">{mainTab === 'live' ? 'Detected while teaching' : 'Headings scanned in this PDF'}</p>
 
                             {mainTab === 'live' && matchHistory.length === 0 && (
                                 <p className="empty-hint-sm">🎙️ Start listening — a topic appears here only when it truly matches this PDF's content.</p>
@@ -53,11 +70,11 @@ function AIPanel(props) {
                                 );
                             })}
 
-                            {mainTab === 'pdf' && pdfTopics.length === 0 && <p className="empty-hint-sm">Scanning PDF content...</p>}
+                            {mainTab === 'pdf' && pdfTopics.length === 0 && <p className="empty-hint-sm">Scanning PDF headings...</p>}
                             {mainTab === 'pdf' && pdfTopics.map(function (t, i) {
                                 return (
                                     <div key={i} className={"ai-topic-item" + (i === selectedPdfIndex ? " active" : "")} onClick={function () { setSelectedPdfIndex(i); }}>
-                                        <span>{t.topic}</span>
+                                        <span>{t.heading || t.topic}</span>
                                     </div>
                                 );
                             })}
@@ -67,7 +84,7 @@ function AIPanel(props) {
                             {current ? (
                                 <React.Fragment>
                                     <div className="ai-tabs">
-                                        <button className={activeSubTab === '3d' ? 'active' : ''} onClick={function () { setActiveSubTab('3d'); }}>🧊 3D</button>
+                                        <button className={activeSubTab === '3d' ? 'active' : ''} onClick={function () { setActiveSubTab('3d'); }}>🧊 3D / Image</button>
                                         <button className={activeSubTab === 'animation' ? 'active' : ''} onClick={function () { setActiveSubTab('animation'); }}>🎞️ Animation</button>
                                         <button className={activeSubTab === 'simulation' ? 'active' : ''} onClick={function () { setActiveSubTab('simulation'); }}>⚙️ Simulation</button>
                                         <button className={activeSubTab === 'quiz' ? 'active' : ''} onClick={function () { setActiveSubTab('quiz'); }}>📝 Quiz</button>
@@ -76,7 +93,14 @@ function AIPanel(props) {
                                         {activeSubTab !== 'quiz' && (
                                             <div className="flashcard-grid">
                                                 {((current.flashcards && current.flashcards[activeSubTab]) || []).map(function (card, i) {
-                                                    return <FlashCard key={card.id || i} card={card} />;
+                                                    return (
+                                                        <FlashCard
+                                                            key={card.id || i}
+                                                            card={card}
+                                                            onEnlarge={handleEnlarge}
+                                                            onPresent={props.onPresentCard}
+                                                        />
+                                                    );
                                                 })}
                                                 {(!current.flashcards || !current.flashcards[activeSubTab] || !current.flashcards[activeSubTab].length) && (
                                                     <p className="empty-hint-sm">No {activeSubTab} content generated for this topic.</p>
@@ -89,11 +113,19 @@ function AIPanel(props) {
                                     </div>
                                 </React.Fragment>
                             ) : (
-                                <p className="empty-hint">Select a topic on the left to view its AI-suggested content.</p>
+                                <p className="empty-hint">Select a heading on the left to view its AI-suggested content.</p>
                             )}
                         </div>
                     </div>
                 </div>
+            )}
+
+            {enlargedCard && (
+                <VisualEnlargeModal
+                    card={enlargedCard}
+                    onClose={handleCloseEnlarge}
+                    onPresent={handlePresentFromModal}
+                />
             )}
         </div>
     );
@@ -102,31 +134,123 @@ function AIPanel(props) {
 function FlashCard(props) {
     var card = props.card;
     var s1 = React.useState(false); var showPreview = s1[0], setShowPreview = s1[1];
+    var s2 = React.useState(false); var imgError = s2[0], setImgError = s2[1];
 
     function handleDragStart(e) {
         e.dataTransfer.setData('application/json', JSON.stringify(card));
         e.dataTransfer.effectAllowed = 'copy';
     }
 
+    function onEnlargeClick(e) {
+        e.stopPropagation();
+        if (props.onEnlarge) props.onEnlarge(card);
+    }
+
+    function onPresentClick(e) {
+        e.stopPropagation();
+        if (props.onPresent) props.onPresent(card);
+    }
+
+    function openLink(e) {
+        e.stopPropagation();
+        if (card.url && card.url !== '#') window.open(card.url, '_blank', 'noopener');
+    }
+
     return (
         <div className="flashcard" draggable={true} onDragStart={handleDragStart}>
+            <div className="flashcard-thumb">
+                {card.kind === 'image' && !imgError ? (
+                    <img src={card.url} alt={card.title} onError={function () { setImgError(true); }} />
+                ) : card.kind === 'video' && card.poster ? (
+                    <img src={card.poster} alt={card.title} />
+                ) : card.embeddable ? (
+                    <div className="flashcard-thumb-placeholder">
+                        <span>{card.type === 'simulation' ? '⚙️' : card.type === 'animation' ? '🎞️' : '🧊'}</span>
+                    </div>
+                ) : (
+                    <div className="flashcard-thumb-placeholder"><span>🔗</span></div>
+                )}
+            </div>
             <div className="flashcard-title">{card.title}</div>
             <div className="flashcard-desc">{card.description}</div>
             <div className="flashcard-actions">
                 <span className="flashcard-drag-hint">✋ Drag onto slide</span>
-                <button className="flashcard-preview-btn" onClick={function (e) { e.stopPropagation(); setShowPreview(!showPreview); }}>
-                    {showPreview ? 'Hide' : '👁 Preview'}
-                </button>
+                <div className="flashcard-btn-row">
+                    <button className="flashcard-preview-btn" onClick={onEnlargeClick} title="Enlarge on screen">🔍 Enlarge</button>
+                    {props.onPresent && (
+                        <button className="flashcard-preview-btn primary" onClick={onPresentClick} title="Present to class">📤 Present</button>
+                    )}
+                </div>
             </div>
             {showPreview && (
                 <div className="flashcard-embed">
                     {card.embeddable ? (
-                        <iframe title={card.title} src={card.url}></iframe>
+                        card.kind === 'image' ? (
+                            <img src={card.url} alt={card.title} />
+                        ) : (
+                            <iframe title={card.title} src={card.url}></iframe>
+                        )
                     ) : (
-                        <p className="empty-hint-sm">Live inline preview isn't available for this one — drag it onto the slide to present it.</p>
+                        <p className="empty-hint-sm">Live inline preview isn't available for this one — use Enlarge or drag it onto the slide.</p>
                     )}
                 </div>
             )}
+        </div>
+    );
+}
+
+function VisualEnlargeModal(props) {
+    var card = props.card;
+    var s1 = React.useState(false); var loadError = s1[0], setLoadError = s1[1];
+
+    function stop(e) { e.stopPropagation(); }
+
+    return (
+        <div className="visual-modal-backdrop" onClick={props.onClose}>
+            <div className="visual-modal" onClick={stop}>
+                <div className="visual-modal-header">
+                    <div className="visual-modal-title-wrap">
+                        <span className="visual-modal-badge">
+                            {card.type === 'simulation' ? '⚙️ Simulation' : card.type === 'animation' ? '🎞️ Animation' : '🧊 3D / Image'}
+                        </span>
+                        <h3>{card.title}</h3>
+                    </div>
+                    <button className="visual-modal-close" onClick={props.onClose} title="Close (Esc)">✕</button>
+                </div>
+
+                <div className="visual-modal-body">
+                    {card.embeddable && !loadError ? (
+                        card.kind === 'image' ? (
+                            <img src={card.url} alt={card.title} onError={function () { setLoadError(true); }} />
+                        ) : card.kind === 'video' ? (
+                            <video src={card.url} controls autoPlay poster={card.poster || ''}></video>
+                        ) : (
+                            <iframe title={card.title} src={card.url} allow="autoplay; fullscreen; xr-spatial-tracking"></iframe>
+                        )
+                    ) : (
+                        <div className="visual-modal-fallback">
+                            <div className="visual-modal-fallback-icon">🔗</div>
+                            <p>This visual can't be embedded directly, but you can open it in a new tab or push it to the class slide.</p>
+                            <div className="visual-modal-fallback-actions">
+                                <button className="btn" onClick={function () { window.open(card.url, '_blank', 'noopener'); }}>🌐 Open in new tab</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="visual-modal-footer">
+                    <p className="visual-modal-desc">{card.description}</p>
+                    <div className="visual-modal-actions">
+                        {card.url && card.url !== '#' && (
+                            <button className="btn secondary" onClick={function () { window.open(card.url, '_blank', 'noopener'); }}>🌐 Open source</button>
+                        )}
+                        {props.onPresent && (
+                            <button className="btn" onClick={function () { props.onPresent(card); }}>📤 Present to class</button>
+                        )}
+                        <button className="btn secondary" onClick={props.onClose}>Close</button>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

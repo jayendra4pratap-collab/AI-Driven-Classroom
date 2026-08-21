@@ -21,6 +21,7 @@ function PresentMode(props) {
     var listeningRef = React.useRef(false);
     var sessionRef = React.useRef(null);
     var fsRef = React.useRef(null);
+    var pdfWrapRef = React.useRef(null);
     var slideshowIntervalRef = React.useRef(null);
 
     var numPages = material.numPages || 1;
@@ -156,6 +157,25 @@ function PresentMode(props) {
 
     function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; }
 
+    function pinCardAt(card, x, y) {
+        // If this exact card is already pinned, just reposition it.
+        setPinnedVisuals(function (prev) {
+            var existing = prev.find(function (v) { return v.id === card.id && v.type === card.type; });
+            if (existing) {
+                return prev.map(function (v) {
+                    return v.id === card.id && v.type === card.type
+                        ? Object.assign({}, v, { x: x, y: y })
+                        : v;
+                });
+            }
+            var newPin = Object.assign({}, card, {
+                pinId: 'pin-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+                x: x, y: y,
+            });
+            return prev.concat([newPin]);
+        });
+    }
+
     function handleDrop(e) {
         e.preventDefault();
         var raw = e.dataTransfer.getData('application/json');
@@ -165,15 +185,26 @@ function PresentMode(props) {
         var rect = e.currentTarget.getBoundingClientRect();
         var x = Math.max(0, e.clientX - rect.left - 140);
         var y = Math.max(0, e.clientY - rect.top - 20);
+        pinCardAt(card, x, y);
+    }
 
-        if (card.pinId) {
-            setPinnedVisuals(function (prev) {
-                return prev.map(function (v) { return v.pinId === card.pinId ? Object.assign({}, v, { x: x, y: y }) : v; });
-            });
-        } else {
-            var newPin = Object.assign({}, card, { pinId: 'pin-' + Date.now() + '-' + Math.floor(Math.random() * 1000), x: x, y: y });
-            setPinnedVisuals(function (prev) { return prev.concat([newPin]); });
+    // Called by the "📤 Present to class" button inside the AI panel.
+    function presentCard(card) {
+        if (!card) return;
+        var el = pdfWrapRef.current;
+        if (!el) {
+            // No slide area mounted; just open source as a fallback.
+            if (card.url && card.url !== '#') window.open(card.url, '_blank', 'noopener');
+            return;
         }
+        var rect = el.getBoundingClientRect();
+        // Center the pinned visual on the slide.
+        var boxW = card.kind === 'image' ? 360 : card.kind === 'video' ? 480 : 420;
+        var boxH = card.kind === 'image' ? 280 : card.kind === 'video' ? 300 : 280;
+        var x = Math.max(10, (rect.width - boxW) / 2);
+        var y = Math.max(10, (rect.height - boxH) / 2);
+        pinCardAt(card, x, y);
+        showToast('📌 ' + (card.title || 'Visual') + ' pinned to slide');
     }
 
     function removePinned(pinId) {
@@ -206,21 +237,32 @@ function PresentMode(props) {
                     </div>
                 )}
 
-                <div className="pdf-frame-wrap" onDragOver={handleDragOver} onDrop={handleDrop}>
+                <div className="pdf-frame-wrap" ref={pdfWrapRef} onDragOver={handleDragOver} onDrop={handleDrop}>
                     <iframe title="pdf" src={pdfSrc} className="pdf-frame"></iframe>
                     {pinnedVisuals.map(function (pin) {
+                        var isMedia = pin.kind === 'image' || pin.kind === 'video';
+                        var boxClass = "pinned-visual-box" + (isMedia ? " media" : "");
                         return (
-                            <div key={pin.pinId} className="pinned-visual-box" style={{ left: pin.x + 'px', top: pin.y + 'px' }}
+                            <div key={pin.pinId} className={boxClass} style={{ left: pin.x + 'px', top: pin.y + 'px' }}
                                 draggable={true} onDragStart={function (e) { handlePinDragStart(e, pin); }}>
                                 <div className="pinned-visual-header">
                                     <span>{pin.title}</span>
                                     <button onClick={function () { removePinned(pin.pinId); }}>✕</button>
                                 </div>
                                 <div className="pinned-visual-body">
-                                    {pin.embeddable ? (
-                                        <iframe title={pin.title} src={pin.url}></iframe>
+                                    {pin.embeddable && pin.kind === 'image' ? (
+                                        <img src={pin.url} alt={pin.title} />
+                                    ) : pin.embeddable && pin.kind === 'video' ? (
+                                        <video src={pin.url} controls autoPlay poster={pin.poster || ''}></video>
+                                    ) : pin.embeddable ? (
+                                        <iframe title={pin.title} src={pin.url} allow="autoplay; fullscreen"></iframe>
                                     ) : (
-                                        <div className="no-embed">🔎 {pin.title}</div>
+                                        <div className="no-embed">
+                                            <div>🔎 {pin.title}</div>
+                                            {pin.url && pin.url !== '#' && (
+                                                <a href={pin.url} target="_blank" rel="noopener noreferrer" className="no-embed-link">Open source ↗</a>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -235,6 +277,7 @@ function PresentMode(props) {
                         hasNewMatch={hasNewMatch}
                         onOpened={function () { setHasNewMatch(false); }}
                         onSendQuiz={sendQuizToStudents}
+                        onPresentCard={presentCard}
                     />
 
                     {isFullscreen ? (
