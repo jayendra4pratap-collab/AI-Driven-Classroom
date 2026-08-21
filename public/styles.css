@@ -9,38 +9,16 @@
   --shadow-sm: 0 2px 8px rgba(20,20,50,0.06);
   --shadow-md: 0 8px 24px rgba(20,20,50,0.10);
   --shadow-lg: 0 16px 48px rgba(20,20,50,0.16);
---navbar-bg: linear-gradient(90deg, #316ec2 35%, #1c4591 70%, #0b2353 100%);
+  --navbar-bg: linear-gradient(120deg,#4f6df5,#7c5cff);
 }
-/* Dark Grey Text for Create Button */
-#create-class-btn,
-.create-classroom-box button,
-.create-classroom-box .btn-primary {
-  color: #334155 !important; /* Rich Dark Slate Grey */
-  font-weight: 700 !important; /* Keeps text crisp and bold */
+[data-theme="dark"] {
+  --bg: #12141c; --surface: #1b1e2b; --surface-alt: #20232f;
+  --text: #eef0f7; --text-muted: #9aa1b5; --border: #2c2f3d;
+  --primary: #7c8dff; --primary-dark: #5f6de0;
+  --primary-gradient: linear-gradient(135deg,#7c8dff,#c17cff); --accent: #29e0b8;
+  --shadow-sm: 0 2px 10px rgba(0,0,0,0.35); --shadow-md: 0 10px 28px rgba(0,0,0,0.45);
+  --shadow-lg: 0 20px 55px rgba(0,0,0,0.55); --navbar-bg: linear-gradient(120deg,#2a2d55,#4a2d7a);
 }
-[data-theme="dark"], body.dark-theme {
-  --bg: #0b1329; 
-  --surface: rgba(19, 31, 58, 0.85); /* Semi-transparent glass surface */
-  --surface-alt: rgba(26, 41, 77, 0.85);
-  --text: #e2f0fe; 
-  --text-muted: #8faadb; 
-  --border: #233763;
-  --primary: #316ec2; 
-  --primary-dark: #5295e2;
-  --primary-gradient: linear-gradient(135deg,#1c4591,#0b2353); 
-  --accent: #29e0b8;
-  --shadow-sm: 0 2px 10px rgba(0,0,0,0.35); 
-  --shadow-md: 0 10px 28px rgba(0,0,0,0.45);
-  --shadow-lg: 0 20px 55px rgba(0,0,0,0.55); 
-  --navbar-bg: linear-gradient(90deg, #5295e2 0%, #316ec2 35%, #1c4591 70%, #0b2353 100%);
-
-  background-image: url('assets/darkbackgroung.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-}
-
 [data-theme="ocean"] {
   --bg: #eaf7fb; --surface: #ffffff; --surface-alt: #f0fbff;
   --text: #0b2b3c; --text-muted: #4c7a8c; --border: #cdeef7;
@@ -49,88 +27,8 @@
   --shadow-sm: 0 2px 8px rgba(8,60,80,0.08); --shadow-md: 0 8px 24px rgba(8,60,80,0.14);
   --shadow-lg: 0 16px 48px rgba(8,60,80,0.2); --navbar-bg: linear-gradient(120deg,#0891b2,#06b6d4);
 }
-/* Universal selector to catch the welcome header regardless of HTML structure */
-.dash-header h1,
-.dash-header h2,
-.dash-header h3,
-.dash-header *,
-[class*="welcome"],
-[class*="greeting"] {
-  font-family: 'Poppins', 'Inter', system-ui, sans-serif !important;
-  font-weight: 800 !important;
-  font-size: 2.2rem !important;
-  letter-spacing: -0.8px !important;
-  
-  /* Dual-tone blue-to-teal gradient */
-  background: linear-gradient(135deg, #1c4591 0%, #4f6df5 50%, #00c9a7 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-  
-  /* Soft glow filter */
-  filter: drop-shadow(0 4px 12px rgba(79, 109, 245, 0.25)) !important;
-}
 
-<<<<<<< HEAD
-/* Dark Mode adjustment for white-to-teal glow */
-html[data-theme="dark"] .dash-header *,
-html[data-theme="dark"] [class*="welcome"] {
-  background: linear-gradient(135deg, #ffffff 0%, #b0d3f9 50%, #29e0b8 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-}
-/* 1. Ensure HTML and Body expand to full height for background rendering */
-html, body {
-  min-height: 100vh !important;
-  width: 100%;
-}
-
-/* 2. Target Body directly for Dark Theme Background Image */
-html[data-theme="dark"] body, 
-body.dark-theme {
-  background-image: url('assets/darkbackground.jpg') !important;
-  background-size: cover !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  background-attachment: fixed !important;
-}
-
-/* 3. Translucent Glass Effect Over Dark Background */
-html[data-theme="dark"] .classroom-card,
-html[data-theme="dark"] .card,
-html[data-theme="dark"] [class*="card"],
-html[data-theme="dark"] .create-classroom-box {
-  background: rgba(19, 31, 58, 0.45) !important; /* Low opacity allows background texture through */
-  backdrop-filter: blur(16px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-  border: 1px solid rgba(226, 240, 254, 0.15) !important;
-}
-
-/* Clear solid child backgrounds sitting inside cards */
-html[data-theme="dark"] .classroom-card *,
-html[data-theme="dark"] .card * {
-  background-color: transparent;
-}
-/* Brighten subtext and secondary labels in Dark Mode */
-html[data-theme="dark"] p,
-html[data-theme="dark"] .dash-subtitle,
-html[data-theme="dark"] [class*="subtitle"],
-html[data-theme="dark"] .text-muted {
-  color: #cbebff !important; /* Bright ice-blue for high contrast */
-  opacity: 0.95;
-}
-
-/* Brighten section headers ("Your Classrooms") */
-html[data-theme="dark"] h3,
-html[data-theme="dark"] h4,
-html[data-theme="dark"] .section-title {
-  color: #f0f7ff !important; /* Crisp white-blue */
-}
-/* ===== BACKGROUND TEXTURES (user-selectable, applied to body) ===== */
-=======
 /* ===== BACKGROUND TEXTURES ===== */
->>>>>>> upstream/main
 html[data-bgtexture="dots"] body {
   background-image: radial-gradient(rgba(120,120,120,0.28) 1px, transparent 1px);
   background-size: 18px 18px;
@@ -151,41 +49,10 @@ html[data-bgtexture="chat"] body {
     radial-gradient(circle at 40% 85%, rgba(120,120,120,0.09) 7px, transparent 8px);
   background-size: 130px 130px;
 }
-/* Designer Brand Styling for "Manan" */
-.navbar-brand, 
-.logo-text, 
-[class*="brand"] span:first-child {
-  font-weight: 800 !important;
-  font-size: 1.65rem !important;
-  letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #ffffff 0%, #a5d8ff 50%, #29e0b8 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-  filter: drop-shadow(0 2px 8px rgba(41, 224, 184, 0.3));
-  transition: transform 0.2s ease, filter 0.2s ease;
-  display: inline-block;
-}
 
-/* Subtle Hover Effect */
-.navbar-brand:hover,
-.logo-text:hover {
-  transform: translateY(-1px) scale(1.02);
-  filter: drop-shadow(0 4px 12px rgba(41, 224, 184, 0.5));
-}
 * { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: var(--font-main);
-  background-color: #0b1329; /* Fallback color matching your ocean theme */
-  color: var(--text);
-  
-  background-image: url('assets/background.jpg'); /* Replace bg.jpg with your image's exact file name */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed; /* Keeps background stationary during scrolling */
-}
+body { margin: 0; font-family: var(--font-main); background-color: var(--bg); color: var(--text); transition: background .3s, color .3s; }
+h1,h2,h3,h4 { font-family: 'Poppins', sans-serif; }
 
 .navbar { background: var(--navbar-bg); color: #fff; padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-md); position: sticky; top: 0; z-index: 100; }
 .navbar-brand { display: flex; align-items: center; gap: 10px; }
@@ -238,42 +105,8 @@ body {
 .classroom-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
 .classroom-card { background: var(--surface); border-radius: var(--radius); overflow: hidden; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform .2s ease, box-shadow .2s ease; border: 1px solid var(--border); position: relative; }
 .classroom-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
-<<<<<<< HEAD
-
-.classroom-banner {
-  height: 90px; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  position: relative;
-  overflow: hidden;
-  background-color: #3a52d9; /* Fallback color while image loads */
-}
-
-.classroom-banner::after {
-  content: ""; 
-  position: absolute; 
-  top: 0; 
-  left: 0; 
-  width: 100%; 
-  height: 100%;
-  background-image: url('/assets/classback.jpg'); 
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  z-index: 1;
-}
-
-/* Ensure text inside banner sits above the image */
-.classroom-banner > * {
-  position: relative;
-  z-index: 2;
-
-}
-=======
 .classroom-banner { height: 90px; display: flex; align-items: center; justify-content: center; position: relative; background: var(--primary-gradient); overflow: hidden; }
 .classroom-banner::after { content: ""; position: absolute; top: -50%; right: -50%; width: 100%; height: 200%; background: rgba(255,255,255,0.12); transform: rotate(25deg); }
->>>>>>> upstream/main
 .classroom-emoji { font-size: 34px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); position: relative; z-index: 1; }
 .classroom-body { padding: 14px 16px 16px; }
 .classroom-body h4 { margin: 0 0 6px; font-size: 17px; color: var(--text); }
@@ -414,111 +247,6 @@ body {
 .auth-switch { text-align: center; margin-top: 16px; color: rgba(255,255,255,0.75); cursor: pointer; font-size: 13px; }
 .auth-switch span b { color: #9db4ff; }
 
-<<<<<<< HEAD
-/* ULTRA-VISIBLE LIGHT MODE GLASS OVERRIDE */
-html[data-theme="light"] .classroom-card,
-html[data-theme="light"] .card,
-html[data-theme="light"] [class*="card"],
-html[data-theme="light"] .create-classroom-box,
-body:not([data-theme="dark"]):not([data-theme="ocean"]) .classroom-card,
-body:not([data-theme="dark"]):not([data-theme="ocean"]) .card,
-body:not([data-theme="dark"]):not([data-theme="ocean"]) .create-classroom-box {
-  /* Dropped to 15% opacity so background geometry clearly shows through */
-  background: rgba(255, 255, 255, 0.15) !important;
-  
-  /* Deep blur + saturation boost */
-  backdrop-filter: blur(25px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
-  
-  /* High-contrast frosted glass border & drop shadow */
-  border: 1.5px solid rgba(255, 255, 255, 0.9) !important;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 
-              inset 0 1px 1px rgba(255, 255, 255, 1) !important;
-}
-
-/* Force strip solid background colors from internal card wrappers */
-html[data-theme="light"] .card-body,
-html[data-theme="light"] .classroom-card-content,
-html[data-theme="light"] .card *,
-html[data-theme="light"] .classroom-card *,
-body:not([data-theme="dark"]):not([data-theme="ocean"]) .card-body,
-body:not([data-theme="dark"]):not([data-theme="ocean"]) .card * {
-  background: transparent !important;
-  background-color: transparent !important;
-}
-
-/* Make inner input boxes pop against the transparent glass */
-html[data-theme="light"] input,
-html[data-theme="light"] .class-code-box,
-body:not([data-theme="dark"]):not([data-theme="ocean"]) input {
-  background: rgba(255, 255, 255, 0.4) !important;
-  border: 1px solid rgba(255, 255, 255, 0.8) !important;
-}
-/* High-Contrast Create Button */
-.create-classroom-box button,
-.create-classroom-box .btn-primary,
-button:contains("Create") {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-  color: #ffffff !important;
-  font-weight: 700 !important;
-  font-size: 0.95rem !important;
-  letter-spacing: 0.3px !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4) !important;
-  transition: all 0.2s ease !important;
-}
-
-/* Hover State */
-.create-classroom-box button:hover {
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6) !important;
-}
-/* Base Create Button Layout */
-.create-classroom-box button,
-.create-classroom-box .btn-primary {
-  font-weight: 700 !important;
-  font-size: 0.95rem !important;
-  letter-spacing: 0.4px !important;
-  border-radius: 8px !important;
-  padding: 10px 24px !important;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  cursor: pointer !important;
-}
-
-/* LIGHT MODE: High Contrast Dark Navy Button */
-html[data-theme="light"] #create-class-btn,
-body:not([data-theme="dark"]):not([data-theme="ocean"]) #create-class-btn {
-  background: #0f172a !important; /* Overrides light blue gradients */
-  background-color: #0f172a !important;
-  color: #ffffff !important;
-  font-weight: 700 !important;
-  border: 1px solid #000000 !important;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.4) !important;
-  text-shadow: none !important;
-}
-
-html[data-theme="light"] #create-class-btn:hover {
-  background: #1e293b !important;
-  background-color: #1e293b !important;
-  transform: translateY(-1px) !important;
-}
-
-/* DARK MODE: High Contrast Bright Button */
-html[data-theme="dark"] #create-class-btn {
-  background: #f0f7ff !important;
-  background-color: #f0f7ff !important;
-  color: #0b1329 !important;
-  font-weight: 800 !important;
-  border: none !important;
-  box-shadow: 0 0 16px rgba(240, 247, 255, 0.3) !important;
-}
-
-html[data-theme="dark"] #create-class-btn:hover {
-  background: #ffffff !important;
-  background-color: #ffffff !important;
-}
-=======
 /* ==========================================================================
    HEADING-BASED FLASHCARDS + ENLARGE MODAL
    ========================================================================== */
@@ -734,4 +462,3 @@ html[data-theme="dark"] #create-class-btn:hover {
 .no-embed-link:hover { text-decoration: underline; }
 
 .ai-tabs button { white-space: nowrap; }
->>>>>>> upstream/main
